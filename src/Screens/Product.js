@@ -6,18 +6,33 @@ import {
   CardBody,
   CardImg,
   CardTitle,
-  CardText
+  CardText,
+  DropdownItem,
+  Dropdown,
+  DropdownMenu,
+  DropdownToggle
 } from "reactstrap";
 import Rupiah from 'rupiah-format'
+import { async } from "q";
+
+
 
 const Product = (props) => {
+ 
+  const handleDelete = async (data, id) => {
+    fetch("http://localhost:9000/api/product/" + id , {method:"DELETE"});
+    window.location.href = 'http://localhost:3000/Dashboard'
+  }
+
+  
+
   const dataProduct = props.dataProduct
     return (
       <>
         <Card>
           <CardImg
             alt="..."
-            src={`http://localhost:7373/${dataProduct.image}`}
+            src={`http://localhost:9000/${dataProduct.image}`}
             top
           />
           <CardBody>
@@ -29,12 +44,13 @@ const Product = (props) => {
                 <span>{Rupiah.convert(dataProduct.price)}</span>              
               </div>
             </CardText>
-            <Button
-              color="primary"
-              onClick={e => props.addCart(dataProduct)}
-            >
-              Add
-            </Button>
+            <Button outline className="ml-5" color="primary" onClick={e => props.addCart(dataProduct)}>
+            <i class="fas fa-plus"/> Add To Cart
+            </Button> <br/>
+            <span >
+            <Button outline color="danger" className="btn btn-md mt-2 " onClick={() => handleDelete(dataProduct, dataProduct.id)} > <i class="far fa-trash-alt"/> Delete </Button> 
+            <Button outline color="info" className="btn btn-md mt-2 "> <i class="far fa-edit"/> Update </Button> 
+            </span>
           </CardBody>
         </Card>
       </>

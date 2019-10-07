@@ -4,6 +4,7 @@ import Product from './Product'
 import axios from 'axios' 
 import Rupiah from 'rupiah-format'
 import { async } from 'q';
+import './Menu.css'
 
 
 
@@ -44,11 +45,10 @@ export default class Menu extends React.Component {
     
       getAll = async () => {
         const { search, sort, limit, page } = this.state
-       await axios.get(`http://localhost:7373/api/product?search=${search}&sort=${sort}&limit=${limit}&page=${page}`)
+       await axios.get(`http://localhost:9000/api/product?search=${search}&sort=${sort}&limit=${limit}&page=${page}`)
           .then(result => {
             let page = []
             this.setState({data: result.data.data})
-            console.log(result.data.totalData)
             const currentAllpage = Math.ceil(result.data.totalData / this.state.limit)
 
             for(let i=0; i < currentAllpage; i++){
@@ -63,39 +63,40 @@ export default class Menu extends React.Component {
           })
       }
 
-
-     
-     
-  
-
       addCart(data) {
+        const { id, name, price, image, count } = data
+        let cart = { id, name, price, image, count: 1}
         const exists = this.state.cart.find(({ id }) => id === data.id)
         if (exists) {
-          window.alert('Barang Sudah Di Cart')
+          window.alert('This Product is already in the cart')
         } else {
           data.count=1
-          const cart = [...this.state.cart, data]
+          const carts = [...this.state.cart, cart]
           this.setState({
-            cart
+            cart : carts
           })
         }
       }
 
       addqty(data) {
         let cart = this.state.cart[data]
+        let product = this.state.data.find(product => product.id == cart.id)
         cart.count += 1
+        cart.price += product.price
         this.setState({
-          cart:[cart]
+          carts:[cart]
         })
 
       }
       reduceqty(data) {
         let cart = this.state.cart[data]
         let allcart = this.state.cart
+        let product = this.state.data.find(product => product.id == cart.id)
         if(cart.count > 1) {
           cart.count -= 1
+          cart.price -= product.price
           this.setState({
-            cart:[cart]
+            carts:[cart]
           })
           
         } else {
@@ -106,11 +107,32 @@ export default class Menu extends React.Component {
         }
       }
 
+      renderTotalCart() {
+        let total = 0
+        this.state.cart.forEach((val, key) => {
+          total += val.price
+        })
+        return (<b>{Rupiah.convert(total)}</b>)
+      }
+
+      cancel = (e) => {
+        e.preventDefault()
+        if(window.confirm('Are You Sure to Empty the Cart'))
+        {
+          this.setState({
+            cart: [],  
+          })
+        }
+      }
+
+      
+
   render() {
     return (
       <Row>
-        <Col xs="6" sm="10">
+        <Col md="10" sm="12">
           <Jumbotron>
+            
               <Input
                type="text" name="search" id="search" placeholder="Search" onChange={(e) => this.searchValue(e)} 
                style={{ width:"30%" }}
@@ -120,16 +142,22 @@ export default class Menu extends React.Component {
                     <a className="dropdown-item" onClick={() => this.sortProduct("name")} >Name</a>
                     <a className="dropdown-item" onClick={() => this.sortProduct("price")} >Price</a>
                     <a className="dropdown-item" onClick={() => this.sortProduct("date_update")} >Date Update</a>
-                  </div>        
+                  </div>    
+                  <div className="text-right">
+                    <Button color="success" href="Add"><i class="fas fa-plus"></i> Add Product </Button> 
+                  </div>
+    
             
            
             <Row>
               {
                 this.state.data.map((item, index) => {
+                  
                   return(
                     <Col className="mt-5" sm="3">
                       <Product dataProduct={item} addCart={data => this.addCart(item)} />
                     </Col>
+                    
                   )
                 })
               }
@@ -152,7 +180,7 @@ export default class Menu extends React.Component {
           </Jumbotron>
         </Col>
 
-        <Col xs="6" sm="2">
+        <Col md="2" sm="12">
           <Container>
             <div>
               <CardHeader className="bg-transparent pb-2">
@@ -166,7 +194,7 @@ export default class Menu extends React.Component {
                   this.state.cart.map((val, key) => {
                     return (
                       <Card style={{ marginTop:"10px" }}><Badge color="success">{this.state.cart.count}</Badge>
-                        <CardImg src={`http://localhost:7373/${val.image}`}/> 
+                        <CardImg src={`http://localhost:9000/${val.image}`}/> 
                         <CardTitle>{val.name}</CardTitle>
                         <CardText>
                           <div style={{display: "grid"}}>
@@ -188,8 +216,16 @@ export default class Menu extends React.Component {
             </div>
           </Container>
           
-            <div class="container">
-              <span class="text-muted">Place sticky footer content here.</span>
+            <div style={{backgroundColor: "white" , position: "sticky", bottom: 0, height:"100px" }} className="container">
+              <Row>
+                <Col md={12}>
+                  <p>{ this.renderTotalCart() }</p>
+                  <Button block color="success" className="btn btn-md ml-2"> CHECKOUT </Button> 
+                </Col>
+                <Col md={12}>
+                  <Button block color="danger" className="btn btn-md ml-2" onClick={this.cancel} > CANCEL </Button>
+                </Col>
+              </Row>
             </div>
          
         </Col>

@@ -16,7 +16,7 @@ export default class Navigation extends React.Component {
   }
  
   getAll = async (value) => {
-    await Axios.get('http://localhost:7373/api/product?search='+ value)
+    await Axios.get('http://localhost:9000/api/product?search='+ value)
     .then(result => {
       this.setState({data: result.data.data})
     })
@@ -35,9 +35,8 @@ export default class Navigation extends React.Component {
     return (
       <div>
         <Navbar color="light" light expand="md">
-        <Button className="btn btn-sm" outline color="success" data-target="#modal-form" href="Add" ><i className="fas fa-plus" ></i></Button>
-          <Nav className="m-auto">
-            <NavbarBrand>Items</NavbarBrand>
+          <Nav className="ml-4">
+            <NavbarBrand className="ml-5">Items</NavbarBrand>
           </Nav>
           <NavbarToggler onClick={this.toggle} />
           <Collapse isOpen={this.state.isOpen} navbar>
@@ -50,16 +49,16 @@ export default class Navigation extends React.Component {
               <NavItem>
                 <NavLink href=""><i class="fas fa-history"></i>History</NavLink>
               </NavItem>
+              <NavItem>
+                <NavLink href="ManageProduct"><i class="fas fa-wrench"></i>Product</NavLink>
+              </NavItem>
               <UncontrolledDropdown nav inNavbar>
                 <DropdownToggle nav caret>
                   <i class="far fa-user-circle"></i>
                 </DropdownToggle>
                 <DropdownMenu right>
                   <DropdownItem>
-                    <Button outline color="success" href="login">Login</Button>
-                  </DropdownItem>
-                  <DropdownItem>
-                    <Button outline color="primary" href="register">Register</Button>
+                    <Button outline color="danger" href="Logout">Logout</Button>
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
