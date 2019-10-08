@@ -1,4 +1,4 @@
-import { Navbar, Nav, NavLink } from 'reactstrap';
+import { Navbar, Nav, Button } from 'reactstrap';
 import React from 'react';
 
 import './nav.css'
@@ -8,7 +8,7 @@ class NavBar extends React.Component {
         return (
             <Navbar color="light" light expand="md">
               <Nav className="ml-5">
-                <NavLink href="Dashboard"><i class="fas fa-home"></i>Home</NavLink>
+                <Button outline color="info" href="Dashboard"><i class="fas fa-chevron-left"></i> Back</Button>
               </Nav> 
             </Navbar>
         )

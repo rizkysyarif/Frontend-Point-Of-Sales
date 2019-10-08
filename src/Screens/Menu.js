@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col, Jumbotron, Form, CardHeader, Badge, CardBody,Card, CardImg, CardTitle, CardText, Button,Pagination, PaginationItem, PaginationLink, Input} from 'reactstrap';
+import { Container, Row, ModalBody,Modal, ModalFooter, ModalHeader, Col, Jumbotron, CardHeader, Badge, CardBody,Card, CardImg, CardTitle, CardText, Button,Pagination, PaginationItem, PaginationLink, Input} from 'reactstrap';
 import Product from './Product'
 import axios from 'axios' 
 import Rupiah from 'rupiah-format'
@@ -7,10 +7,9 @@ import { async } from 'q';
 import './Menu.css'
 
 
-
 export default class Menu extends React.Component {
     constructor(props) {
-        super()
+        super(props)
         this.state = {
           data: [],
           cart: [],
@@ -18,9 +17,18 @@ export default class Menu extends React.Component {
           sort: '',
           limit: '8',
           page: '1',
-          allPage:[]
-        }
+          allPage:[],
+          modal: false
+        };
+        this.toggle = this.toggle.bind(this);
       }
+
+      toggle() {
+        this.setState(prevState => ({
+          modal: !prevState.modal
+        }));
+      }
+    
     
       async componentDidMount() {
         await this.getAll()
@@ -49,14 +57,13 @@ export default class Menu extends React.Component {
           .then(result => {
             let page = []
             this.setState({data: result.data.data})
+            
             const currentAllpage = Math.ceil(result.data.totalData / this.state.limit)
-
+            
             for(let i=0; i < currentAllpage; i++){
               page.push(i+1)
             }
-
             this.setState({allPage:page})
-            
           })
           .catch(err => {
             console.log(err)
@@ -64,13 +71,13 @@ export default class Menu extends React.Component {
       }
 
       addCart(data) {
-        const { id, name, price, image, count } = data
-        let cart = { id, name, price, image, count: 1}
+        const { id, name, price, image, count } = { ...data }
+        let cart = { id, name, price, image, count, qty: 1}
         const exists = this.state.cart.find(({ id }) => id === data.id)
         if (exists) {
           window.alert('This Product is already in the cart')
         } else {
-          data.count=1
+          data.qty = 1
           const carts = [...this.state.cart, cart]
           this.setState({
             cart : carts
@@ -81,19 +88,23 @@ export default class Menu extends React.Component {
       addqty(data) {
         let cart = this.state.cart[data]
         let product = this.state.data.find(product => product.id == cart.id)
-        cart.count += 1
+        if(cart.qty < product.count){
+          cart.qty += 1
         cart.price += product.price
         this.setState({
           carts:[cart]
         })
+        }
+        
+
 
       }
       reduceqty(data) {
         let cart = this.state.cart[data]
         let allcart = this.state.cart
         let product = this.state.data.find(product => product.id == cart.id)
-        if(cart.count > 1) {
-          cart.count -= 1
+        if(cart.qty > 1) {
+          cart.qty -= 1
           cart.price -= product.price
           this.setState({
             carts:[cart]
@@ -105,6 +116,15 @@ export default class Menu extends React.Component {
             cart: allcart
           })
         }
+      }
+
+      remove(data){
+        let allcart = this.state.cart
+
+        allcart.splice(data, 1)
+          this.setState({
+            cart: allcart
+        })
       }
 
       renderTotalCart() {
@@ -129,6 +149,7 @@ export default class Menu extends React.Component {
 
   render() {
     return (
+      <>
       <Row>
         <Col md="10" sm="12">
           <Jumbotron>
@@ -152,22 +173,21 @@ export default class Menu extends React.Component {
             <Row>
               {
                 this.state.data.map((item, index) => {
-                  
-                  return(
+                  return(                   
                     <Col className="mt-5" sm="3">
                       <Product dataProduct={item} addCart={data => this.addCart(item)} />
-                    </Col>
-                    
-                  )
-                })
+                    </Col>                    
+                  )                  
+                })             
               }
             </Row>
             <Row>
               <Col sm="9">
-              <Pagination>
+              <Pagination className="mt-3" >
               {
                 this.state.allPage.map(item => (  
                 <PaginationItem key={item}>
+                  
                   <PaginationLink onClick={() => this.pageChange(item)}>
                     {item}
                   </PaginationLink>
@@ -201,9 +221,10 @@ export default class Menu extends React.Component {
                             <span>
                               {Rupiah.convert(val.price)}
                               <div className="container mt-3">
-                                <Button color="success" className="btn btn-sm ml-2" onClick={()=>{ this.addqty(key) } } > <i className="fas fa-plus"/> </Button> 
-                                <span>{val.count}</span>
+                                <Button color="success" className="btn btn-sm ml-3 mr-2" onClick={()=>{ this.addqty(key) } } > <i className="fas fa-plus"/> </Button> 
+                                <span>{val.qty}</span>
                                 <Button color="danger" className="btn btn-sm ml-3" onClick={()=>{ this.reduceqty(key) } } > <i class="fas fa-minus"></i> </Button> 
+                                <Button color="danger" className="btn btn-sm ml-4 mt-2" onClick={()=>{ this.remove(key) } } > Remove </Button> 
                               </div> 
                             </span>              
                           </div>
@@ -214,24 +235,37 @@ export default class Menu extends React.Component {
                 }
               </CardBody>
             </div>
-          </Container>
-          
+          </Container>          
             <div style={{backgroundColor: "white" , position: "sticky", bottom: 0, height:"100px" }} className="container">
               <Row>
                 <Col md={12}>
                   <p>{ this.renderTotalCart() }</p>
-                  <Button block color="success" className="btn btn-md ml-2"> CHECKOUT </Button> 
+                  <Button block color="success" className="btn btn-md ml-2" onClick={this.toggle}> CHECKOUT </Button> 
                 </Col>
                 <Col md={12}>
                   <Button block color="danger" className="btn btn-md ml-2" onClick={this.cancel} > CANCEL </Button>
                 </Col>
               </Row>
             </div>
-         
         </Col>
       </Row>
 
+
+      {/* MODAL */}
+      <div>
+        <Modal isOpen={this.state.modal} fade={false} toggle={this.toggle} className={this.props.className}>
+          <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
+          <ModalBody>
+            Lorem ipsum dolor sit amet
+          </ModalBody>
+          <ModalFooter>
+            <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
+            <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
+      </div>
       
+      </>
     );
   }
 }

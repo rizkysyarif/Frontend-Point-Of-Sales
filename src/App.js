@@ -9,6 +9,7 @@ import Dashboard from './Components/Dashboard'
 import Add from './Screens/Add'
 import Logout from './Screens/Logout'
 import ManageProduct from './Screens/ManageProduct'
+import UpdateProduct from './Screens/UpdateProduct'
 
 
 
@@ -16,7 +17,6 @@ import ManageProduct from './Screens/ManageProduct'
 class App extends Component {
   render(){
     return(
-      //<Provider>
         <Router>
           <Route exact path={'/'} component={Login}></Route>
           <Route exact path={'/Register'} component={Register}></Route>
@@ -24,9 +24,9 @@ class App extends Component {
           <Route exact path={'/Add'} component={Add}></Route>
           <Route exact path={'/Logout'} component={Logout}></Route>
           <Route exact path={'/ManageProduct'} component={ManageProduct}></Route>
+          <Route exact path={'/UpdateProduct/:id'} component={UpdateProduct}></Route>
 
         </Router>
-     // </Provider>
     )
   }
 }
