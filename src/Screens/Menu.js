@@ -8,6 +8,7 @@ import { async } from 'q';
 import './Menu.css'
 import { getProduct } from '../Public/Redux/Actions/Product'
 import { connect } from 'react-redux'
+import {Link} from 'react-router-dom'
 
 
 
@@ -202,7 +203,7 @@ class Menu extends React.Component {
                     </DropdownMenu>
                   </ButtonDropdown>
                   <div className="text-right">
-                    <Button color="success" href="Add"><i class="fas fa-plus"></i> Add Product </Button> 
+                    <Link to="/Add" className="btn btn-success"><i class="fas fa-plus"></i> Add Product </Link> 
                   </div>
     
             

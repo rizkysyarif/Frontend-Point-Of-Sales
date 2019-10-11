@@ -3,6 +3,7 @@ import { Collapse, Navbar, NavbarToggler, NavbarBrand, Nav, NavItem, NavLink, Fo
 import './nav.css'
 import Menu from '../Screens/Menu'
 import Axios from 'axios';
+import { Link } from 'react-router-dom'
 
 export default class Navigation extends React.Component {
   constructor(props) {
@@ -47,10 +48,10 @@ export default class Navigation extends React.Component {
                 <NavLink href=""><i class="fas fa-home"></i>Home</NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="History"><i class="fas fa-history"></i>History</NavLink>
+                <Link to="/History" className="nav-link"><i class="fas fa-history"></i>History</Link>
               </NavItem>
               <NavItem>
-                <NavLink href="ManageProduct"><i class="fas fa-wrench"></i>Product</NavLink>
+                <Link to="/ManageProduct" className="nav-link"><i class="fas fa-wrench"></i>Product</Link>
               </NavItem>
               <UncontrolledDropdown nav inNavbar>
                 <DropdownToggle nav caret>
