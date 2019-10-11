@@ -1,15 +1,21 @@
 import React from 'react';
-import { Container, Row, ModalBody,Modal, ModalFooter, ModalHeader, Col, Jumbotron, CardHeader, Badge, CardBody,Card, CardImg, CardTitle, CardText, Button,Pagination, PaginationItem, PaginationLink, Input} from 'reactstrap';
+import { Container, Row, ModalBody,Modal, ModalFooter, ModalHeader, Col, Jumbotron, CardHeader, Badge, CardBody,Card, CardImg, CardTitle, 
+  CardText, Button,Pagination, PaginationItem, PaginationLink, Input, DropdownMenu, DropdownItem, DropdownToggle, ButtonDropdown} from 'reactstrap';
 import Product from './Product'
 import axios from 'axios' 
 import Rupiah from 'rupiah-format'
 import { async } from 'q';
 import './Menu.css'
+import { getProduct } from '../Public/Redux/Actions/Product'
+import { connect } from 'react-redux'
 
 
-export default class Menu extends React.Component {
+
+class Menu extends React.Component {
     constructor(props) {
         super(props)
+        this.toggle = this.toggle.bind(this);
+        this.toggleDropdown = this.toggleDropdown.bind(this);
         this.state = {
           data: [],
           cart: [],
@@ -18,21 +24,42 @@ export default class Menu extends React.Component {
           limit: '8',
           page: '1',
           allPage:[],
-          modal: false
+          modal: false,
+          dropdownOpen: false,
+          total_price: 0
         };
-        this.toggle = this.toggle.bind(this);
+      }
+
+      toggleDropdown() {
+        this.setState({
+          dropdownOpen: !this.state.dropdownOpen
+        });
       }
 
       toggle() {
         this.setState(prevState => ({
           modal: !prevState.modal
         }));
+        if(!this.state.modal){
+          this.checkout()
+        }else{
+          this.setState({ cart:[], total_price: 0 })
+        }
+      }
+
+      checkout = () => {
+        let resOrders = []
+        this.state.cart.map(item=>{
+          const finalData = Object.keys(item).map(i=> {return item[i]})
+          resOrders.push([finalData[0], finalData[2],finalData[5]])
+        })
+        let order = { total_price: this.state.total_price, order: resOrders}
+        axios.post('http://localhost:9000/api/order', order )
       }
     
     
       async componentDidMount() {
         await this.getAll()
-        
       }
       async searchValue(e) {
         let value = e.target.value
@@ -50,72 +77,71 @@ export default class Menu extends React.Component {
         this.getAll()
       }
       
-    
       getAll = async () => {
-        const { search, sort, limit, page } = this.state
-       await axios.get(`http://localhost:9000/api/product?search=${search}&sort=${sort}&limit=${limit}&page=${page}`)
-          .then(result => {
-            let page = []
-            this.setState({data: result.data.data})
+        const page = []
+        const result =  await this.props.dispatch(getProduct({
+          search: this.state.search,
+          sort: this.state.sort,
+          limit: this.state.limit,
+          page: this.state.page
+        }))
+        const currentAllpage = Math.ceil(result.value.data.totalData / this.state.limit)
             
-            const currentAllpage = Math.ceil(result.data.totalData / this.state.limit)
-            
-            for(let i=0; i < currentAllpage; i++){
-              page.push(i+1)
-            }
-            this.setState({allPage:page})
-          })
-          .catch(err => {
-            console.log(err)
-          })
+        for(let i=0; i < currentAllpage; i++){
+          page.push(i+1)
+        }
+        this.setState({allPage:page})
       }
-
-      addCart(data) {
+    
+      async addCart(data) {
         const { id, name, price, image, count } = { ...data }
         let cart = { id, name, price, image, count, qty: 1}
         const exists = this.state.cart.find(({ id }) => id === data.id)
         if (exists) {
           window.alert('This Product is already in the cart')
-        } else {
+        } else if(count < 1){
+          window.alert('This Product is empty')
+        }
+        else {
           data.qty = 1
           const carts = [...this.state.cart, cart]
-          this.setState({
+          await this.setState({
             cart : carts
           })
         }
+        await this.renderTotalCart()
       }
 
-      addqty(data) {
+      async addqty(data) {
         let cart = this.state.cart[data]
-        let product = this.state.data.find(product => product.id == cart.id)
+        let product = this.props.data.productList.find(product => product.id == cart.id)
         if(cart.qty < product.count){
           cart.qty += 1
         cart.price += product.price
-        this.setState({
+        await this.setState({
           carts:[cart]
         })
         }
-        
-
-
+        await this.renderTotalCart()
       }
-      reduceqty(data) {
+      async reduceqty(data) {
         let cart = this.state.cart[data]
         let allcart = this.state.cart
-        let product = this.state.data.find(product => product.id == cart.id)
+        let product = this.props.data.productList.find(product => product.id == cart.id)
         if(cart.qty > 1) {
           cart.qty -= 1
           cart.price -= product.price
-          this.setState({
+          await this.setState({
             carts:[cart]
           })
           
         } else {
           allcart.splice(data, 1)
-          this.setState({
+          await this.setState({
             cart: allcart
           })
         }
+        await this.renderTotalCart()
       }
 
       remove(data){
@@ -126,13 +152,15 @@ export default class Menu extends React.Component {
             cart: allcart
         })
       }
-
-      renderTotalCart() {
+      
+      async renderTotalCart() {
         let total = 0
         this.state.cart.forEach((val, key) => {
           total += val.price
         })
-        return (<b>{Rupiah.convert(total)}</b>)
+        await this.setState({total_price: total})
+        console.log(this.state.total_price)
+        // return (<b>{Rupiah.convert(total)}</b>)
       }
 
       cancel = (e) => {
@@ -147,23 +175,32 @@ export default class Menu extends React.Component {
 
       
 
+
+
+      
+
   render() {
     return (
       <>
-      <Row>
+      <Row style={{ marginTop: 50 }}>
         <Col md="10" sm="12">
           <Jumbotron>
             
               <Input
                type="text" name="search" id="search" placeholder="Search" onChange={(e) => this.searchValue(e)} 
                style={{ width:"30%" }}
-               />     
-                <Button type="button" className="btn btn-secondary dropdown-toggle mt-2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort By</Button>
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" onClick={() => this.sortProduct("name")} >Name</a>
-                    <a className="dropdown-item" onClick={() => this.sortProduct("price")} >Price</a>
-                    <a className="dropdown-item" onClick={() => this.sortProduct("date_update")} >Date Update</a>
-                  </div>    
+               />      
+                  <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
+                    <DropdownToggle caret>
+                      Sort By
+                    </DropdownToggle>
+                    <DropdownMenu>
+                      <DropdownItem  onClick={() => this.sortProduct("name")}>Name</DropdownItem>
+                      <DropdownItem onClick={() => this.sortProduct("price")}>Price</DropdownItem>
+                      <DropdownItem onClick={() => this.sortProduct("date_added")}>Date Add</DropdownItem>
+                      <DropdownItem onClick={() => this.sortProduct("date_update")}>Date Update</DropdownItem>
+                    </DropdownMenu>
+                  </ButtonDropdown>
                   <div className="text-right">
                     <Button color="success" href="Add"><i class="fas fa-plus"></i> Add Product </Button> 
                   </div>
@@ -172,7 +209,7 @@ export default class Menu extends React.Component {
            
             <Row>
               {
-                this.state.data.map((item, index) => {
+                this.props.data.productList.map((item, index) => {
                   return(                   
                     <Col className="mt-5" sm="3">
                       <Product dataProduct={item} addCart={data => this.addCart(item)} />
@@ -239,7 +276,7 @@ export default class Menu extends React.Component {
             <div style={{backgroundColor: "white" , position: "sticky", bottom: 0, height:"100px" }} className="container">
               <Row>
                 <Col md={12}>
-                  <p>{ this.renderTotalCart() }</p>
+                  <p>{ Rupiah.convert(this.state.total_price) }</p>
                   <Button block color="success" className="btn btn-md ml-2" onClick={this.toggle}> CHECKOUT </Button> 
                 </Col>
                 <Col md={12}>
@@ -254,13 +291,42 @@ export default class Menu extends React.Component {
       {/* MODAL */}
       <div>
         <Modal isOpen={this.state.modal} fade={false} toggle={this.toggle} className={this.props.className}>
-          <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
+          <ModalHeader toggle={this.toggle}>CHECKOUT</ModalHeader>
           <ModalBody>
-            Lorem ipsum dolor sit amet
+          <Row>
+                          <Col xs="5"><th>Name</th></Col>
+                          <Col xs="3"> <th>Quantity</th></Col>
+                          <Col xs="4"><th>Price</th></Col>
+                        </Row>
+          {
+                  this.state.cart.map((val, key) => {
+                    return (
+                      <div>
+                        <Row>
+                          <Col xs="6">{val.name}</Col>
+                          <Col xs="1"> {val.qty} </Col>
+                          <Col xs="1"> : </Col>
+                          <Col xs="4">{Rupiah.convert(val.price)}</Col>
+                        </Row>               
+                      </div>
+                        
+                    )
+                  })
+                }
+                <br/>
+                <div>
+                  <Card>
+                  <Row>
+                    <Col xs="7">Total</Col>
+                    <Col xs="1"> : </Col>
+                    <Col xs="4">{Rupiah.convert(this.state.total_price)}</Col>
+                 </Row>
+                 </Card>
+                </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
-            <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+            <Button color="primary" onClick={this.toggle}> <i class="fas fa-print"></i> Print</Button>{' '}
+            <Button color="success" onClick={this.toggle}> <i class="fas fa-envelope"></i> Send Email</Button>
           </ModalFooter>
         </Modal>
       </div>
@@ -269,3 +335,10 @@ export default class Menu extends React.Component {
     );
   }
 }
+const mapStateToProps = state => {
+  return {
+    data: state.productList
+  }
+}
+
+export default connect (mapStateToProps)(Menu)

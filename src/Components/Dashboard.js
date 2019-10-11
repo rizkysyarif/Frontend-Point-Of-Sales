@@ -34,7 +34,7 @@ export default class Navigation extends React.Component {
   render() {
     return (
       <div>
-        <Navbar color="light" light expand="md">
+        <Navbar color="light" light expand="md" style={{ zIndex: 1 }}  sticky={'top'} >
           <Nav className="ml-4">
             <NavbarBrand className="ml-5">Items</NavbarBrand>
           </Nav>
@@ -47,7 +47,7 @@ export default class Navigation extends React.Component {
                 <NavLink href=""><i class="fas fa-home"></i>Home</NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href=""><i class="fas fa-history"></i>History</NavLink>
+                <NavLink href="History"><i class="fas fa-history"></i>History</NavLink>
               </NavItem>
               <NavItem>
                 <NavLink href="ManageProduct"><i class="fas fa-wrench"></i>Product</NavLink>

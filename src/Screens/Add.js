@@ -9,7 +9,6 @@ class Add extends React.Component {
   addProduct(e) {
     e.preventDefault()
     const data = new FormData(e.target)
-    console.log(data)
   
     fetch('http://localhost:9000/api/product', {
       method: 'POST',

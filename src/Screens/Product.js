@@ -39,7 +39,9 @@ const Product = (props) => {
             <CardText>
               <div style={{display: "grid"}}>
                 <span>{dataProduct.description}</span>
-                <span>{Rupiah.convert(dataProduct.price)}</span>              
+                <span>{Rupiah.convert(dataProduct.price)}</span>   
+                <span>Stock : {(dataProduct.count)}</span>  
+
               </div>
             </CardText>
             <Button outline className="ml-5" color="primary" onClick={e => props.addCart(dataProduct)}>
