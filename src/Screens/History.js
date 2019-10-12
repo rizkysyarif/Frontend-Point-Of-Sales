@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Line } from 'react-chartjs-2'
-import { Card, CardBody, CardTitle, Container, Row, Col, Table,Pagination, PaginationItem, PaginationLink } from "reactstrap";
+import { Card, CardBody, CardTitle, Container, Row, Col, Table,Pagination, PaginationItem, PaginationLink,Jumbotron } from "reactstrap";
 import Navbar from '../Components/Navbar'
+import Sidebar from '../Components/Sidebar'
 import Axios from 'axios';
 import Rupiah from 'rupiah-format'
 import { async } from 'q';
@@ -96,6 +97,8 @@ export default class History extends Component {
       this.getOrder()
     }
 
+
+
     handleLineChart = (event) => {
         let val = event.target.value
         this.drawGraph(val)
@@ -108,7 +111,7 @@ export default class History extends Component {
                 weekly.push(item.INCOME)
             })
             const dataChart = {
-                labels: ["1", "2", "3", "4", "5","6","7"],
+                labels: ["", "", "", "", "","",""],
                 datasets: [
                     {
                         label: "This Week",
@@ -195,9 +198,16 @@ export default class History extends Component {
         this.state.yearlyIncome.map(item =>{
             annual = item.INCOME
         })
+        console.log(dailyAmount)
         return (
     <>
-        <Navbar/>
+    <Row>
+      <Col xs="1">
+          <Sidebar />
+      </Col>
+      <Col xs="11" style={{ marginLeft: "-40px" }}>
+      <Navbar/>
+      <Jumbotron>
         <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
           <Container fluid>
             <div className="header-body">
@@ -230,8 +240,14 @@ export default class History extends Component {
                         
                       </Row>
                       <p className="mt-3 mb-0 text-sm">
-                        <span className="text-success mr-2">
-                          <i className="fa fa-plus" /> 2%
+                        <span className="text-danger mr-2">
+                          <i className="fa fa-arrow-down" /> 10%
+                          {/* { Math.round(
+                            ((daily[daily.length - 1] - daily[daily.length - 2]) / 
+                              daily[daily.length - 2 ]) 
+                            
+                          ) } */}
+                          
                         </span>{" "}
                         <span className="text-nowrap">Yesterday</span>
                       </p>
@@ -260,7 +276,14 @@ export default class History extends Component {
                       </Row>
                       <p className="mt-3 mb-0 text-sm">
                         <span className="text-success mr-2">
-                          <i className="fas fa-plus" /> 5%
+                          <i className="fas fa-plus" /> 
+                          {/* { Math.round(
+                            ((dailyAmount[dailyAmount.length - 1] - dailyAmount[dailyAmount.length - 2]) / 
+                              dailyAmount[dailyAmount.length - 2 ]) 
+                            
+                          ) } */}
+                          
+                          5 %
                         </span>{" "}
                         <span className="text-nowrap">Last Week</span>
                       </p>
@@ -326,17 +349,12 @@ export default class History extends Component {
 
         {/* History Order */}
         <Container className="mt-5 mb-5" style={{
+          backgroundColor: "white",
           boxShadow: "6px 4px 8px 6px rgba(0, 0, 0, 0.2)",
           padding: "16px",
         }}>
           
             <h3> Recent Order </h3>
-            {/* <select style={{ width:'20%' }} >
-              <option value="today">Today</option>
-              <option value="">Weekly</option>
-              <option value="">Monthly</option>
-              <option value="" > Annual </option>
-            </select> */}
             <Table striped>
             
                 <thead>
@@ -382,7 +400,12 @@ export default class History extends Component {
               </Col>
             </Row>
             </Table>
-      </Container>
+            
+        </Container>
+      </Jumbotron>
+      </Col>
+    </Row>
+        
       
     </>
         )

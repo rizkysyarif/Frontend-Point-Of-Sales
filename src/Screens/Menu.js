@@ -183,7 +183,7 @@ class Menu extends React.Component {
   render() {
     return (
       <>
-      <Row style={{ marginTop: 50 }}>
+      <Row style={{ }}>
         <Col md="10" sm="12">
           <Jumbotron>
             
