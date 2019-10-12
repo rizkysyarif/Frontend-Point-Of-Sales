@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Line } from 'react-chartjs-2'
-import { Card, CardBody, CardTitle, Container, Row, Col, Table,Pagination, PaginationItem, PaginationLink,Jumbotron } from "reactstrap";
-import Navbar from '../Components/Navbar'
+import { Card, CardBody, CardTitle, Container, Row, Col, Table,Pagination, PaginationItem, PaginationLink,Jumbotron, Nav, Navbar, NavbarBrand } from "reactstrap";
 import Sidebar from '../Components/Sidebar'
 import Axios from 'axios';
 import Rupiah from 'rupiah-format'
@@ -206,9 +205,9 @@ export default class History extends Component {
           <Sidebar />
       </Col>
       <Col xs="11" style={{ marginLeft: "-40px" }}>
-        <Navbar color="light" light expand="md">
+        <Navbar color="light" light expand="md" style={{ zIndex : 1 }}>
           <Nav className="ml-5">
-          <NavbarBrand className="ml-5">History</NavbarBrand>
+           <h2 style={{ marginLeft: "650px"}} >History</h2>
           </Nav> 
         </Navbar>
       <Jumbotron>

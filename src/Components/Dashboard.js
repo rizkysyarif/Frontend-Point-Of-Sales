@@ -41,7 +41,7 @@ export default class Navigation extends React.Component {
             <Sidebar />
           </Col>
           <Col xs="11"  style={{ marginLeft: "-40px", zIndex: 1 }}>
-            <Navbar color="light" light expand="md"style={{  }} >
+            <Navbar color="light" light expand="md"style={{ zIndex : 1 }} >
             <Nav className="" >
               <NavbarBrand className="ml-5">Items</NavbarBrand>
             </Nav>
