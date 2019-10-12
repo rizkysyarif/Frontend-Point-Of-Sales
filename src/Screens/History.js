@@ -206,7 +206,11 @@ export default class History extends Component {
           <Sidebar />
       </Col>
       <Col xs="11" style={{ marginLeft: "-40px" }}>
-      <Navbar/>
+        <Navbar color="light" light expand="md">
+          <Nav className="ml-5">
+          <NavbarBrand className="ml-5">History</NavbarBrand>
+          </Nav> 
+        </Navbar>
       <Jumbotron>
         <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
           <Container fluid>
