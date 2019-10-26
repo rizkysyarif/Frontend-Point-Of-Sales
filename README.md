@@ -1,5 +1,5 @@
 # Frontend - Point Of Sales
-
+![image](https://lh3.google.com/u/1/d/1UoC78nDZq1NV8VmcExb2Z52XTOKxjmdU=w1600-h757-iv1)
 
 ## Table of contents
 
