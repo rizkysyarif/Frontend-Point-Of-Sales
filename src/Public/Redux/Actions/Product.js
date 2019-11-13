@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+
 export const getProduct = options => {
   return {
     type: 'GET_PRODUCT',
@@ -11,7 +12,8 @@ export const getProduct = options => {
             page = '1'
         } = options
 
-        axios.get(`http://localhost:9000/api/product?search=${search}&sort=${sort}&limit=${limit}&page=${page}`)
+        axios.get(`http://localhost:9000/api/product?search=${search}&sort=${sort}&limit=${limit}&page=${page}`,{
+        })
             .then(result => resolve(result))
             .catch(error => reject(error))    
     })

@@ -160,7 +160,7 @@ class Menu extends React.Component {
           total += val.price
         })
         await this.setState({total_price: total})
-        console.log(this.state.total_price)
+        // console.log(this.state.total_price)
         // return (<b>{Rupiah.convert(total)}</b>)
       }
 
@@ -183,7 +183,7 @@ class Menu extends React.Component {
   render() {
     return (
       <>
-      <Row style={{ }}>
+      <Row>
         <Col md="10" sm="12">
           <Jumbotron>
             

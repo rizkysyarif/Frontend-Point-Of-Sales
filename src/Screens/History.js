@@ -16,11 +16,14 @@ export default class History extends Component {
             weeklyIncome:[],
             monthlyIncome:[],
             yearlyIncome: [],
+            weekly:[],
+            thisWeek:[],
             data: {},
             order:[],
             allPage:[],
             limit:"10",
-            page: "1"
+            page: "1",
+            checkOrder: ""
         }
     }
 
@@ -44,28 +47,34 @@ export default class History extends Component {
         for(let i=0; i < currentAllpage; i++){
           page.push(i+1)
         }
-
         this.setState({allPage:page})
       })
       .catch(err =>{
         console.log(err)
       }) 
+      
     }
 
     getDailyIncome = async () => {
        await Axios.get('http://localhost:9000/api/history/dailyincome')
         .then(result => {
+          console.log(result)
             this.setState({dailyIncome: result.data.data})
         })
         .catch(err => {
             console.log(err)
         })
+        
     }
 
     getWeeklyIncome = async () => {
        await Axios.get('http://localhost:9000/api/history/weeklyIncome')
         .then(result => {
-            this.setState({weeklyIncome: result.data.data})
+            this.setState({
+              weeklyIncome: result.data.data,
+              weekly: result.data.week,
+              weeklyAmount: result.data.week['thisWeek'][0]['AMOUNT']
+            })
         })
         .catch(err => {
             console.log(err)
@@ -107,24 +116,34 @@ export default class History extends Component {
     drawGraph = (val) => {
         if(val == "weekly") {
             let weekly = [0]
+            let weekly_new = []
+            let weekly_last = []
+            let labels = []
             this.state.weeklyIncome.map(item =>{
                 weekly.push(item.INCOME)
             })
+            this.state.weekly.thisWeek.map(item =>{ 
+              weekly_new.push(item.TOTAL)
+            })
+            this.state.weekly.lastWeek.map(item =>{
+              labels.push(item.DAY)
+              weekly_last.push(item.TOTAL)
+            })
             const dataChart = {
-                labels: ["", "", "", "", "","",""],
+                labels: labels,
                 datasets: [
                     {
                         label: "This Week",
                         borderColor: "rgba(255, 0, 255, 0.75)",
                         backgroundColor: "",
                         fill: null,
-                        data: weekly.slice(Math.max(weekly.length - 7, 0))
+                        data: weekly_new
                     },
                     {
                         label: "Last Week",
                         borderColor: "rgba(0, 255, 0, 0.75)",
                         fill: null,
-                        data: weekly.slice(Math.max(weekly.length - 14, 0)).slice(0, 7)
+                        data: weekly_last
                     }
                 ]
                 
@@ -187,18 +206,17 @@ export default class History extends Component {
 
 
     render() {
+        let orderId = ""
         let daily = [0]
-        let dailyAmount = []
-        this.state.dailyIncome.map(item => {
-            daily.push(item.INCOME)
-            dailyAmount.push(item.AMOUNT)
-        })
+        let weeklyAmount = []
+        // this.state.weekly.thisWeek.map(item =>{     
+        //   weeklyAmount.push(item.AMOUNT)
+        // })
 
         let annual = 0
         this.state.yearlyIncome.map(item =>{
             annual = item.INCOME
         })
-        console.log(dailyAmount)
         return (
     <>
     <Row>
@@ -238,19 +256,19 @@ export default class History extends Component {
                             Today's Income
                           </CardTitle>
                           <span className="h2 font-weight-bold mb-0">
-                            {Rupiah.convert(daily[daily.length - 1])}
+                            {Rupiah.convert(this.state.dailyIncome['today'])}
                           </span>
                         </div>
                         
                       </Row>
                       <p className="mt-3 mb-0 text-sm">
-                        <span className="text-danger mr-2">
-                          <i className="fa fa-arrow-down" /> 10%
-                          {/* { Math.round(
-                            ((daily[daily.length - 1] - daily[daily.length - 2]) / 
-                              daily[daily.length - 2 ]) 
+                        <span className="text-success mr-2">
+                          <i className="fa fa-arrow-up" />
+                          { Math.round(
+                            ((this.state.dailyIncome['yesterday'] - this.state.dailyIncome['today']) / 
+                            this.state.dailyIncome['yesterday'] * 100) 
                             
-                          ) } */}
+                          ) } %
                           
                         </span>{" "}
                         <span className="text-nowrap">Yesterday</span>
@@ -274,7 +292,7 @@ export default class History extends Component {
                             Orders
                           </CardTitle>
                           <span className="h2 font-weight-bold mb-0">
-                            {dailyAmount[dailyAmount.length - 1]}
+                            {this.state.weeklyAmount}
                           </span>
                         </div>
                       </Row>
@@ -371,18 +389,33 @@ export default class History extends Component {
                 </tr>
                 </thead>
                 <tbody>
-                
                   {
                     this.state.order.map((val, key) => {
-                      return(
-                        <tr>
-                          <td>{val.no_recipient}</td>
-                          <td>{FormatDate(val.create_date).format("MMM Do YY")}</td>
-                          <td>{val.name}</td>
-                          <td> {val.quantity} </td>
-                          <td> {Rupiah.convert(val.price_order)} </td>
-                        </tr>
-                      )
+                      if(orderId !== val.no_recipient){
+                        orderId = val.no_recipient
+                        return(
+                          <tr>
+                            
+                            <td>{val.no_recipient}</td>
+                            <td>{FormatDate(val.create_date).format("MMM Do YY")}</td>
+                            <td>{val.name}</td>
+                            <td> {val.quantity} </td>
+                            <td> {Rupiah.convert(val.price_order)} </td>
+                          </tr>
+                        )
+                      } else {
+                        return(
+                          <tr>
+                            
+                            <td></td>
+                            <td></td>
+                            <td>{val.name}</td>
+                            <td> {val.quantity} </td>
+                            <td> {Rupiah.convert(val.price_order)} </td>
+                          </tr>
+                        )
+                      }
+                      
                     })
                   }
                     
