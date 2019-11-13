@@ -4,6 +4,7 @@ import { Card, CardBody, CardTitle, Container, Row, Col, Table,Pagination, Pagin
 import Sidebar from '../Components/Sidebar'
 import Axios from 'axios';
 import Rupiah from 'rupiah-format'
+import FormatDate from 'moment'
 import { async } from 'q';
 
 
@@ -376,7 +377,7 @@ export default class History extends Component {
                       return(
                         <tr>
                           <td>{val.no_recipient}</td>
-                          <td>{val.create_date}</td>
+                          <td>{FormatDate(val.create_date).format("MMM Do YY")}</td>
                           <td>{val.name}</td>
                           <td> {val.quantity} </td>
                           <td> {Rupiah.convert(val.price_order)} </td>
