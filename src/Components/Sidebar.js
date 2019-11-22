@@ -48,7 +48,7 @@ class SideNav extends Component {
 
                     <Link to="/Dashboard" className="sidemenu" > <i class="fas fa-home" /> </Link> 
                     <Link to="/History" className="sidemenu" > <i class="fas fa-history"></i></Link>
-                    <Link to="/ManageProduct" className="sidemenu" onClick={this.toggle}> <i class="fas fa-wrench"></i> </Link>
+                    <Link to="/ManageProduct" className="sidemenu" > <i class="fas fa-wrench"></i> </Link>
 
                      {/* <Link to="/ManageProduct" className="nav-link"><i class="fas fa-wrench"></i>Product</Link> */}
                      {/* className="nav-link" */}

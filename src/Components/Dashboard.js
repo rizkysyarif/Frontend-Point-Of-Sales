@@ -1,20 +1,26 @@
 import React from 'react';
-import { Collapse, Navbar, NavbarToggler, NavbarBrand, Nav, NavItem, NavLink, Row, Button, Col, UncontrolledDropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
 import '../assets/css/nav.css'
 import Menu from '../Screens/Menu'
-import Sidebar from './Sidebar'
+import NavBar from './Navbar'
+import SideDrawer from './SideDrawer/SideDrawer'
+import Backdrop from './Backdrop/Backdrop'
 import Axios from 'axios';
-import { Link } from 'react-router-dom'
 
 export default class Navigation extends React.Component {
   constructor(props) {
     super(props);
-
-    this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
-      collapsed: true
-    };
-    
+      sideDrawerOpen: false
+    }   
+  }
+  drawerToggleClickHandler = () => {
+    this.setState((prevState) => {
+      return {sideDrawerOpen: !prevState.sideDrawerOpen}
+    })
+  }
+
+  backdropClickHandler = () => {
+    this.setState({sideDrawerOpen:false})
   }
  
   getAll = async (value) => {
@@ -27,47 +33,19 @@ export default class Navigation extends React.Component {
     })
   }
 
-  toggleNavbar() {
-    this.setState({
-      collapsed: !this.state.collapsed
-    });
-  }
   
   render() {
+    let backdrop
+
+    if(this.state.sideDrawerOpen){
+      backdrop = <Backdrop click={this.backdropClickHandler} />
+    }
     return (
       <div>
-        <Row>
-          <Col xs="1">
-            <Sidebar />
-          </Col>
-          <Col xs="11"  style={{ marginLeft: "-40px", zIndex: 1 }}>
-            <Navbar color="light" light expand="md"style={{ zIndex : 1 }} >
-            <Nav className="" >
-              <NavbarBrand className="ml-5">Items</NavbarBrand>
-            </Nav>
-            <NavbarToggler onClick={this.toggle} />
-            <Collapse isOpen={this.state.isOpen} navbar>
-              <Nav className="ml-auto" navbar>
-                <UncontrolledDropdown nav inNavbar>
-                  <DropdownToggle nav caret>
-                    <i class="far fa-user-circle"></i>
-                  </DropdownToggle>
-                  <DropdownMenu right>
-                    <DropdownItem>
-                      <Button outline color="danger" href="Logout">Logout</Button>
-                    </DropdownItem>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-              </Nav>
-            </Collapse>
-            
-          </Navbar>
-
-        <Menu/>
-          </Col>
-        </Row>
-        
-      
+        <NavBar drawerClickHandler={this.drawerToggleClickHandler} />
+        <SideDrawer show={this.state.sideDrawerOpen}/>
+        {backdrop}
+        <Menu />
       </div>
       
 

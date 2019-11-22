@@ -1,8 +1,7 @@
 import React from "react";
-import { Label, FormText, Jumbotron, Button, Col, FormGroup, Row, Form, Input, CardHeader, Card, CardBody } from 'reactstrap';
+import { Label, FormText, Jumbotron, Button, Col, FormGroup, Form, Input, CardHeader, Card, CardBody } from 'reactstrap';
 import "../assets/vendor/nucleo/css/nucleo.css";
 import "../assets/vendor/@fortawesome/fontawesome-free/css/all.min.css";
-import Navbar from '../Components/Navbar'
 
 class Add extends React.Component {
 
@@ -21,8 +20,6 @@ class Add extends React.Component {
   render() {
     return (
       <>
-      
-      <Navbar/>
       <div style={{marginRight:"-400px", marginLeft:"500px"}}>
         
         <Col lg="5" md="5">

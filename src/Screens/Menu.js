@@ -1,11 +1,9 @@
 import React from 'react';
 import { Container, Row, ModalBody,Modal, ModalFooter, ModalHeader, Col, Jumbotron, CardHeader, Badge, CardBody,Card, CardImg, CardTitle, 
   CardText, Button,Pagination, PaginationItem, PaginationLink, Input, DropdownMenu, DropdownItem, DropdownToggle, ButtonDropdown} from 'reactstrap';
-import Product from './Product'
+import Product from './Product/Product'
 import axios from 'axios' 
 import Rupiah from 'rupiah-format'
-import { async } from 'q';
-import './Menu.css'
 import { getProduct } from '../Public/Redux/Actions/Product'
 import { connect } from 'react-redux'
 import {Link} from 'react-router-dom'
@@ -115,7 +113,7 @@ class Menu extends React.Component {
 
       async addqty(data) {
         let cart = this.state.cart[data]
-        let product = this.props.data.productList.find(product => product.id == cart.id)
+        let product = this.props.data.productList.find(product => product.id === cart.id)
         if(cart.qty < product.count){
           cart.qty += 1
         cart.price += product.price
@@ -128,7 +126,7 @@ class Menu extends React.Component {
       async reduceqty(data) {
         let cart = this.state.cart[data]
         let allcart = this.state.cart
-        let product = this.props.data.productList.find(product => product.id == cart.id)
+        let product = this.props.data.productList.find(product => product.id === cart.id)
         if(cart.qty > 1) {
           cart.qty -= 1
           cart.price -= product.price
@@ -145,14 +143,15 @@ class Menu extends React.Component {
         await this.renderTotalCart()
       }
 
-      remove(data){
+      async remove(data){
         let allcart = this.state.cart
 
         allcart.splice(data, 1)
-          this.setState({
-            cart: allcart
-        })
-      }
+        await this.setState({
+                  cart: allcart
+              })
+          await this.renderTotalCart()
+        }
       
       async renderTotalCart() {
         let total = 0
@@ -160,8 +159,6 @@ class Menu extends React.Component {
           total += val.price
         })
         await this.setState({total_price: total})
-        // console.log(this.state.total_price)
-        // return (<b>{Rupiah.convert(total)}</b>)
       }
 
       cancel = (e) => {
@@ -169,7 +166,8 @@ class Menu extends React.Component {
         if(window.confirm('Are You Sure to Empty the Cart'))
         {
           this.setState({
-            cart: [],  
+            cart: [],
+            total_price: 0
           })
         }
       }
@@ -185,13 +183,13 @@ class Menu extends React.Component {
       <>
       <Row>
         <Col md="10" sm="12">
-          <Jumbotron>
+          {/* <Jumbotron> */}
             
               <Input
                type="text" name="search" id="search" placeholder="Search" onChange={(e) => this.searchValue(e)} 
-               style={{ width:"30%" }}
+               style={{ width:"30%", marginTop:10, marginLeft:10 }}
                />      
-                  <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
+                  <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown} style={{marginLeft:10}}>
                     <DropdownToggle caret>
                       Sort By
                     </DropdownToggle>
@@ -203,14 +201,14 @@ class Menu extends React.Component {
                     </DropdownMenu>
                   </ButtonDropdown>
                   <div className="text-right">
-                    <Link to="/Add" className="btn btn-success"><i class="fas fa-plus"></i> Add Product </Link> 
+                    <Link to="/Add" className="btn btn-success"><i className="fas fa-plus"></i> Add Product </Link> 
                   </div>
     
             
            
             <Row>
               {
-                this.props.data.productList.map((item, index) => {
+                this.props.data.productList.map((item) => {
                   return(                   
                     <Col className="mt-5" sm="3">
                       <Product dataProduct={item} addCart={data => this.addCart(item)} />
@@ -219,7 +217,7 @@ class Menu extends React.Component {
                 })             
               }
             </Row>
-            <Row>
+            <Row style={{marginLeft:10}}>
               <Col sm="9">
               <Pagination className="mt-3" >
               {
@@ -235,15 +233,15 @@ class Menu extends React.Component {
               </Pagination>
               </Col>
             </Row>
-          </Jumbotron>
+          {/* </Jumbotron> */}
         </Col>
-
-        <Col md="2" sm="12">
+        <Col md="2" sm="12" style={{borderStyle:'ridge', borderRight:0, borderTop:0}}>
           <Container>
             <div>
-              <CardHeader className="bg-transparent pb-2">
-                <div className="text-muted text-center mt-2 mb-1">
-                  <h2><i class="fas fa-cart-plus"></i> Cart <Badge color="secondary">{this.state.cart.length}</Badge></h2>
+              <CardHeader className=" pb-2" style={{backgroundColor:'#f8f9fa',boxShadow: "2px 2px 2px 2px rgba(0, 0, 0, 0.2)",
+                    padding: "6px",}}>
+                <div className="text-muted text-center mt-2 mb-1" >
+                  <h2><i className="fas fa-cart-plus"></i> Cart <Badge color="secondary">{this.state.cart.length}</Badge></h2>
                 </div>
                 
               </CardHeader>
@@ -251,7 +249,8 @@ class Menu extends React.Component {
                 {
                   this.state.cart.map((val, key) => {
                     return (
-                      <Card style={{ marginTop:"10px" }}><Badge color="success">{this.state.cart.count}</Badge>
+                      <Card style={{ marginTop:"10px", boxShadow: "2px 2px 2px 2px rgba(0, 0, 0, 0.2)",
+                      padding: "6px" }}><Badge color="success">{this.state.cart.count}</Badge>
                         <CardImg src={`http://localhost:9000/${val.image}`}/> 
                         <CardTitle>{val.name}</CardTitle>
                         <CardText>

@@ -2,7 +2,6 @@ import React from "react";
 import { Label, FormText, Jumbotron, Button, Col, FormGroup, Form, Input, CardHeader, Card, CardBody } from 'reactstrap';
 import "../assets/vendor/nucleo/css/nucleo.css";
 import "../assets/vendor/@fortawesome/fontawesome-free/css/all.min.css";
-import Navbar from '../Components/Navbar'
 import Axios from "axios";
 import { Link } from 'react-router-dom'
 
@@ -36,13 +35,11 @@ class Add extends React.Component {
       .catch(err => {
         console.log(err)
       })
-      console.log(this.state.categories)
     }
 
     getProduct = async () => {
       await Axios.get(`http://localhost:9000/api/product/${this.props.match.params.id}`)
       .then(result => {
-        console.log(result.data.data)
         this.setState({
           category: result.data.data[0].category,
           description: result.data.data[0].description,

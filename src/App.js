@@ -3,13 +3,13 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 import { Provider } from "react-redux";
 
 import './App.css'
-import Login from './Screens/Login'
-import Register from './Screens/Register'
+import Login from './Screens/Auth/Login'
+import Register from './Screens/Auth/Register'
 import Dashboard from './Components/Dashboard'
 import Add from './Screens/Add'
-import Logout from './Screens/Logout'
+import Logout from './Screens/Auth/Logout'
 import ManageProduct from './Screens/ManageProduct'
-import History from './Screens/History'
+import History from './Screens/History/History'
 import UpdateProduct from './Screens/UpdateProduct'
 import store from './Public/Redux/store'
 
